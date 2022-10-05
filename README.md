@@ -1,2 +1,3 @@
-# cs_7180_proj2
-Project 2: Intrinsic Imaging
+# Project 2: Intrinsic Imaging
+
+Implimentation of "Intrinsic Images by Entropy Minimization" by Graham D. Finlayson, Mark S. Drew, and Cheng Lu. 
