@@ -17,7 +17,7 @@ def test():
     cv2.waitKey()
     cv2.destroyAllWindows()
 
-def readimg(dir): 
+def readimgs(dir): 
     '''Function to read all the images in a directory
         @param dir: indicates the directory to walk
         @return: dict of numpy arrays {image name : numpyarray}
@@ -25,13 +25,14 @@ def readimg(dir):
     
     images = {}
     for file in os.listdir(dir): 
-        name = os.join(dir, file)
-        if os.isfile(name): 
+        name = os.path.join(dir, file)
+        if os.path.isfile(name): 
             split = os.path.splitext(name)
             imgName = split[0]
             ext = split[1]
             if ext == ".jpg" or ext == ".png": 
                 # if we get here, this is 1.) a file, and 2.) the file is an image
+                print("here")
                 img = cv2.imread(name, 1)
                 images[imgName] = img
     
@@ -40,7 +41,9 @@ def readimg(dir):
 
 
 def main(): 
-    test()
+    images = readimgs("./imgs/")
+
+
 
 if __name__ == "__main__":
     main()
