@@ -68,6 +68,7 @@ def main():
     images = readimgs("./imgs/")
     chromas = calcImgChromaticity(images)
     print(chromas)
+    print("Branching test")
 
 if __name__ == "__main__":
     main()
