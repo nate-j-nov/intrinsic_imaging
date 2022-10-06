@@ -56,6 +56,7 @@ def calcImgChromaticity(imagesDict):
 
                 if(r == 0): continue
 
+                # yeah these def have to be log chromaticity
                 chroma[row, col, 0] = g / r
                 chroma[row, col, 1] = b / r
         
@@ -68,7 +69,6 @@ def main():
     images = readimgs("./imgs/")
     chromas = calcImgChromaticity(images)
     print(chromas)
-    print("Branching test")
 
 if __name__ == "__main__":
     main()
