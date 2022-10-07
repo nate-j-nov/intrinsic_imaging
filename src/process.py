@@ -7,6 +7,7 @@ import cv2
 from importlib_metadata import files
 import numpy as np
 import os
+import math
 
 def test():
     '''Function to test dependencies'''
@@ -65,10 +66,50 @@ def calcImgChromaticity(imagesDict):
     return chromaDict
 
 
+def removeDuplicateChromaticities(chromaDict): 
+    '''
+    Function to remove duplicate chromaticities
+    @param chromaDict: dictionary of image names and their chromaticity {image name : np array of (G/R, B/R) chromaticity }
+    @return: dictionary of image names and unique chromaticities {image name : np array of (G/R, B/R) chromaticity }
+    '''
+    uniqueChromasDict = {}
+
+    for key in chromaDict: 
+        chroma = chromaDict[key]
+        width, height, depth = chroma.shape
+        uniqueChromas = np.array([])
+        for i in range(width): 
+            for j in range(height): 
+                pixelchr = chroma[i][j]
+                if not contains(uniqueChromas, pixelchr): 
+                    uniqueChromas.append(pixelchr)
+        uniqueChromasDict[key] = uniqueChromas
+
+    return uniqueChromasDict
+
+
+def contains(collection, comparer):
+    '''
+    Function to determine if a collection contains a certain item 
+    @param collection: nparray to determine to check if an item is contained within it
+    @param comparer: item to dtermine if it exists in it
+    @return: boolean indicating if comparer is in the collection
+    ''' 
+    height, width, depth = collection.shape
+    for i in range(height): 
+        for j in range(width): 
+            item = collection[i][j]
+            if math.isclose(item[0], comparer[0]) and math.isclose(item[1], comparer[1]): 
+                return True
+    
+    return False;
+
+    pass
+
 def main(): 
     images = readimgs("./imgs/")
     chromas = calcImgChromaticity(images)
-    print(chromas)
+    removeDuplicateChromaticities(chromas)
 
 if __name__ == "__main__":
     main()
