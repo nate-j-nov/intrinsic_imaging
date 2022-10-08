@@ -78,16 +78,14 @@ def removeDuplicateChromaticities(chromaDict):
         chroma = chromaDict[key]
         width, height, depth = chroma.shape
         
-        uniqueChromas = []
+        uniqueChromas = set()
 
         for i in range(width): 
             for j in range(height): 
                 pixelchr = chroma[i][j]
                 gr = pixelchr[0]
                 br = pixelchr[1]
-                if not contains(uniqueChromas, [gr, br]): 
-                    print(f"appended: {i}, {j}")
-                    uniqueChromas.append([gr, br])
+                uniqueChromas.add(tuple([gr, br]))
         
         print(f"chroma len: {chroma.shape}\nuniquechromas len: {len(uniqueChromas)}")
         uniqueChromasDict[key] = np.array(uniqueChromas)
@@ -95,20 +93,20 @@ def removeDuplicateChromaticities(chromaDict):
     return uniqueChromasDict
 
 
-def contains(collection, comparer):
-    '''
-    Function to determine if a collection contains a certain item 
-    @param collection: nparray to determine to check if an item is contained within it
-    @param comparer: item to dtermine if it exists in it
-    @return: boolean indicating if comparer is in the collection
-    ''' 
-    for item in collection: 
-        if math.isclose(item[0], comparer[0]) and math.isclose(item[1], comparer[1]): 
-            return True
-    
-    return False;
-
-    pass
+#def contains(collection, comparer):
+#    '''
+#    Function to determine if a collection contains a certain item 
+#    @param collection: nparray to determine to check if an item is contained within it
+#    @param comparer: item to dtermine if it exists in it
+#    @return: boolean indicating if comparer is in the collection
+#    ''' 
+#    for item in collection: 
+#        if math.isclose(item[0], comparer[0]) and math.isclose(item[1], comparer[1]): 
+#            return True
+#    
+#    return False;
+#
+#    pass
 
 def main(): 
     images = readimgs("./imgs/")
