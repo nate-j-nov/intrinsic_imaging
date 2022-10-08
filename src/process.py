@@ -2,6 +2,7 @@
 # CS 7180: Advanced perception 
 # Module to hold all of the steps of the algorithm
 
+from gc import collect
 from genericpath import isfile
 import cv2
 from importlib_metadata import files
@@ -73,17 +74,23 @@ def removeDuplicateChromaticities(chromaDict):
     @return: dictionary of image names and unique chromaticities {image name : np array of (G/R, B/R) chromaticity }
     '''
     uniqueChromasDict = {}
-
     for key in chromaDict: 
         chroma = chromaDict[key]
         width, height, depth = chroma.shape
-        uniqueChromas = np.array([])
+        
+        uniqueChromas = []
+
         for i in range(width): 
             for j in range(height): 
                 pixelchr = chroma[i][j]
-                if not contains(uniqueChromas, pixelchr): 
-                    uniqueChromas.append(pixelchr)
-        uniqueChromasDict[key] = uniqueChromas
+                gr = pixelchr[0]
+                br = pixelchr[1]
+                if not contains(uniqueChromas, [gr, br]): 
+                    print(f"appended: {i}, {j}")
+                    uniqueChromas.append([gr, br])
+        
+        print(f"chroma len: {chroma.shape}\nuniquechromas len: {len(uniqueChromas)}")
+        uniqueChromasDict[key] = np.array(uniqueChromas)
 
     return uniqueChromasDict
 
@@ -95,12 +102,9 @@ def contains(collection, comparer):
     @param comparer: item to dtermine if it exists in it
     @return: boolean indicating if comparer is in the collection
     ''' 
-    height, width, depth = collection.shape
-    for i in range(height): 
-        for j in range(width): 
-            item = collection[i][j]
-            if math.isclose(item[0], comparer[0]) and math.isclose(item[1], comparer[1]): 
-                return True
+    for item in collection: 
+        if math.isclose(item[0], comparer[0]) and math.isclose(item[1], comparer[1]): 
+            return True
     
     return False;
 
