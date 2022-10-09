@@ -17,8 +17,9 @@ def chartChromaticity(chroma, show = True, save = False, savefn = "./out/chromap
     @param save: bool to indicate to save the plot
     @param savefn: file name to save the image
     '''
-    xvals = chroma[:, :, 0]
-    yvals = chroma[:, :, 1]
+    print(chroma.shape)
+    xvals = chroma[:, 0]
+    yvals = chroma[:, 1]
 
     plt.scatter(x = xvals, y = yvals, s = 10, facecolors = "none", edgecolors = "black")
     plt.xlabel("log(G/R)")
@@ -34,8 +35,7 @@ def chartChromaticity(chroma, show = True, save = False, savefn = "./out/chromap
 
 def chartEntropy(entropyData, show = True, save = False, savefn = "./out/entropyplt.png"): 
     '''
-    Function to chart the entropy of an image at each angle of projection
-    @param entropyData: nparray of size with the degree as the x value and entropy as the y value
+    Function to chart the entropy of an image at each angle of projection @param entropyData: nparray of size with the degree as the x value and entropy as the y value
     @param show: bool to indicate to show the plot or not
     @param save: bool to indicate to save the plot
     @param savefn: file name to save the image
@@ -63,9 +63,11 @@ def chartTests():
     '''
     images = process.readimgs("./imgs/")
     chromas = process.calcImgChromaticity(images)
+    uniqueChromas = process.removeDuplicateChromaticities(chromas)
+
     keys = list(chromas.keys())
-    chroma = chromas[keys[0]]
-    chartChromaticity(chroma, False)
+    chroma = uniqueChromas[keys[0]]
+    chartChromaticity(chroma)
     numangles = 180
     testdata = np.zeros((numangles, 2), dtype=float)
     height, width = testdata.shape

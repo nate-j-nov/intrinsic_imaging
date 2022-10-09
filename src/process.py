@@ -71,7 +71,7 @@ def removeDuplicateChromaticities(chromaDict):
     '''
     Function to remove duplicate chromaticities
     @param chromaDict: dictionary of image names and their chromaticity {image name : np array of (G/R, B/R) chromaticity }
-    @return: dictionary of image names and unique chromaticities {image name : np array of (G/R, B/R) chromaticity }
+    @return: dictionary of image names and unique chromaticities {image name : set of (G/R, B/R) chromaticity }
     '''
     uniqueChromasDict = {}
     for key in chromaDict: 
@@ -88,7 +88,12 @@ def removeDuplicateChromaticities(chromaDict):
                 uniqueChromas.add(tuple([gr, br]))
         
         print(f"chroma len: {chroma.shape}\nuniquechromas len: {len(uniqueChromas)}")
-        uniqueChromasDict[key] = np.array(uniqueChromas)
+        chromalist = []
+
+        for item in uniqueChromas: 
+            chromalist.append([item[0], item[1]])
+
+        uniqueChromasDict[key] = np.array(chromalist)
 
     return uniqueChromasDict
 
