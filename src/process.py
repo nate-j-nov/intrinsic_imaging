@@ -71,7 +71,7 @@ def removeDuplicateChromaticities(chromaDict):
     '''
     Function to remove duplicate chromaticities
     @param chromaDict: dictionary of image names and their chromaticity {image name : np array of (G/R, B/R) chromaticity }
-    @return: dictionary of image names and unique chromaticities {image name : set of (G/R, B/R) chromaticity }
+    @return: dictionary of image names and unique chromaticities {image name : nparray of (G/R, B/R) chromaticity }
     '''
     uniqueChromasDict = {}
     for key in chromaDict: 
@@ -111,6 +111,35 @@ def removeDuplicateChromaticities(chromaDict):
 #    return False;
 #
 #    pass
+
+def project(theta: int, chromas: np.ndarray) -> np.ndarray:
+    ''' Function to project 2d points according to angle theta
+    @param theta: integer representing the angle of rotation in degrees
+    @param chromas: Nx2 ndarray of chromaticity values
+    @return: Nx1 ndarray of projected chromaticity intensities
+    '''
+    assert chromas.shape[0] == 2 or chromas.shape[1] == 2, "Dimension of ndarray is incorrect"
+    # if ndarray is Nx2, transpose it
+    if chromas.shape[1] == 2:
+        chromas = chromas.transpose()
+
+    # create rotation matrix
+    theta_r = math.radians(theta)
+    cosa = math.cos(theta_r)
+    sina = math.sin(theta_r)
+    rotation = np.array([[cosa, -sina], [sina, cosa]])
+    print(rotation) # print rotation matrix
+
+    # matrix multiply rotation by chromas 
+    rotated = np.matmul(rotation, chromas)
+    print(rotated)
+
+    projected = rotated[0]
+    print(projected)
+    return projected
+
+    
+
 
 def main(): 
     images = readimgs("./imgs/")
