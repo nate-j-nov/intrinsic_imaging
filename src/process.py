@@ -7,6 +7,8 @@ from genericpath import isfile
 import cv2
 from importlib_metadata import files
 import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.markers import MarkerStyle
 import os
 import math
 
@@ -44,7 +46,8 @@ def calcImgChromaticity(imagesDict):
     '''
     Function to calculate the chromaticity of each pixel in the image
     @param imagesDict: dictionary of images {image name : np array}
-    @return: dictionary of image names and their chromaticity {image name : np array of (G/R, B/R) chromaticity }
+    @return: dictionary of image names and their chromaticity 
+        {image name : np array of (log(G/R), log(B/R)) chromaticity }
     '''
     chromaDict = {}
     for key in imagesDict: 
@@ -54,13 +57,11 @@ def calcImgChromaticity(imagesDict):
         for row in range(height): 
             for col in range(width): 
                 pixel = bgrImage[row, col]
-                b, g, r = pixel[0], pixel[1], pixel[2]
+                # add 1 to avoid divide by zero and log(0) errors
+                b, g, r = pixel[0]+1, pixel[1]+1, pixel[2]+1 
 
-                if(r == 0): continue
-
-                # yeah these def have to be log chromaticity
-                chroma[row, col, 0] = g / r
-                chroma[row, col, 1] = b / r
+                chroma[row, col, 0] = math.log(g / r)
+                chroma[row, col, 1] = math.log(b / r)
         
         chromaDict[key] = chroma
 
@@ -135,7 +136,7 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
     print(rotated)
 
     projected = rotated[0]
-    print(projected)
+    print(f"projected = {projected}")
     return projected
 
     
@@ -144,7 +145,22 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
 def main(): 
     images = readimgs("./imgs/")
     chromas = calcImgChromaticity(images)
-    removeDuplicateChromaticities(chromas)
+    unique_chromas = removeDuplicateChromaticities(chromas)
+    for key in unique_chromas.keys():
+        print(f"unique_chromas key = {key}")
+    pic1 = unique_chromas['./imgs/pic.0001']
+    print(f"pic1 shape: {pic1.shape}")
+    zeros = np.zeros(pic1.shape)
+    print(f"zeros shape: {zeros.shape}")
+    for i in range(12):
+        theta = i*15
+        projections = project(theta, pic1)
+        zeros.transpose()[0] = projections
+        print(f"zero_proj = {zeros}")
+        plt.scatter(zeros[:,0], zeros[:,1], 1)
+        plt.show()
+        
+
 
 if __name__ == "__main__":
     main()
