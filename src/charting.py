@@ -17,7 +17,6 @@ def chartChromaticity(chroma, show = True, save = False, savefn = "./out/chromap
     @param save: bool to indicate to save the plot
     @param savefn: file name to save the image
     '''
-    print(chroma.shape)
     xvals = chroma[:, 0]
     yvals = chroma[:, 1]
 
@@ -32,6 +31,31 @@ def chartChromaticity(chroma, show = True, save = False, savefn = "./out/chromap
         plt.savefig(savefn)
 
     plt.close()
+
+def originalChromasAndProjectedChromas(orig, projected, show = True, save = False, savefn = "./out/origAndProjectedChromas.png"): 
+    '''
+    Function to plot the original and projected chromaticities
+    @param orig: np array of (G/R, B/R) chromaticity before projection
+    @param projected: np array of projected chromas
+    @param show: bool to indicate to show the plot or not
+    @param save: bool to indicate to save the plot
+    @param savefn: file name to save the image
+    '''
+    xvals = orig[:, 0]
+    yvals = orig[:, 1]
+
+    plt.scatter(x = xvals, y = yvals, s = 10, facecolors = "none", edgecolors="black")
+
+    xvals = projected[:, 0]
+    yvals = projected[:, 1]
+
+    plt.scatter(x = xvals, y = yvals, s = 10, facecolors = "none", edgecolors = "lightblue")
+
+    if(show): 
+        plt.show()
+    
+    if(save): 
+        plt.safefig(savefn)
 
 def chartEntropy(entropyData, show = True, save = False, savefn = "./out/entropyplt.png"): 
     '''
