@@ -5,7 +5,6 @@
 from gc import collect
 from genericpath import isfile
 import cv2
-from importlib_metadata import files
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.markers import MarkerStyle
