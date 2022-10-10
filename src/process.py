@@ -138,6 +138,21 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
     print(f"projected = {projected}")
     return projected
 
+def entropy(chromas: np.ndarray) -> float:
+    hist = np.histogram(chromas, bins=64)[0]
+    print(f"Histogram: {hist}")
+    sum_bins = hist.sum()
+    print(f"Histogram sum: {sum_bins}")
+    px = hist/sum_bins
+    px = np.sort(px)
+    px = np.trim_zeros(px)
+    print(f"Probability hist: {px}")
+    px = -px*np.log2(px)
+    print(f"Probability hist: {px}")
+    entropy = px.sum()
+    print(f"Entropy = {entropy}")
+
+
     
 
 
