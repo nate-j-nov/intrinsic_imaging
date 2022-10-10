@@ -87,7 +87,6 @@ def removeDuplicateChromaticities(chromaDict):
                 br = pixelchr[1]
                 uniqueChromas.add(tuple([gr, br]))
         
-        print(f"chroma len: {chroma.shape}\nuniquechromas len: {len(uniqueChromas)}")
         chromalist = []
 
         for item in uniqueChromas: 
@@ -97,29 +96,14 @@ def removeDuplicateChromaticities(chromaDict):
 
     return uniqueChromasDict
 
-#def contains(collection, comparer):
-#    '''
-#    Function to determine if a collection contains a certain item 
-#    @param collection: nparray to determine to check if an item is contained within it
-#    @param comparer: item to dtermine if it exists in it
-#    @return: boolean indicating if comparer is in the collection
-#    ''' 
-#    for item in collection: 
-#        if math.isclose(item[0], comparer[0]) and math.isclose(item[1], comparer[1]): 
-#            return True
-#    
-#    return False;
-#
-#    pass
-
-def project(theta: int, chromas: np.ndarray) -> np.ndarray:
-    ''' Function to project 2d points according to angle theta
+def rotate(theta: int, chromas: np.ndarray) -> np.ndarray: 
+    '''
+    Function to rotate an nd array by angle theta
     @param theta: integer representing the angle of rotation in degrees
     @param chromas: Nx2 ndarray of chromaticity values
-    @return: Nx1 ndarray of projected chromaticity intensities
+    @param chromas: Nx2 ndarray of chromaticity values
+    @return: Nx2 ndarray of rotate chromaticit points
     '''
-    assert chromas.shape[0] == 2 or chromas.shape[1] == 2, "Dimension of ndarray is incorrect"
-    # if ndarray is Nx2, transpose it
     if chromas.shape[1] == 2:
         chromas = chromas.transpose()
 
@@ -132,6 +116,22 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
 
     # matrix multiply rotation by chromas 
     rotated = np.matmul(rotation, chromas)
+
+    return rotated
+
+def project(theta: int, chromas: np.ndarray) -> np.ndarray:
+    ''' Function to project 2d points according to angle theta
+    @param theta: integer representing the angle of rotation in degrees
+    @param chromas: Nx2 ndarray of chromaticity values
+    @return: Nx1 ndarray of projected chromaticity intensities
+    '''
+    assert chromas.shape[0] == 2 or chromas.shape[1] == 2, "Dimension of ndarray is incorrect"
+    # if ndarray is Nx2, transpose it
+    if chromas.shape[1] == 2:
+        chromas = chromas.transpose()
+
+    # matrix multiply rotation by chromas 
+    rotated = rotate(theta, chromas)
     #print(rotated)
 
     projected = rotated[0]

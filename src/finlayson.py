@@ -8,6 +8,7 @@ import process as p
 import charting as c
 from decimal import Decimal
 import cv2
+import math 
 
 def main(): 
     print(f"Reading images...")
@@ -27,28 +28,31 @@ def main():
         print(f"unique_chromas key = {key}")
     pic1 = unique_chromas['./imgs/shady_person']
     entropies = []
-    zeros = np.zeros(pic1.shape)
+    projectionsXY = np.zeros(pic1.shape)
+    projectionsByAngle = []
     print(f"Computing entropies...")
     for theta in range(180):
         projections = p.project(theta, pic1)
-        zeros.transpose()[0] = projections
-       # if theta % 5 == 0:
-       #     plt.xlim(-4.5,4.5)
-       #     plt.scatter(zeros[:,0], zeros[:,1], 0.5)
-       #     plt.show()
-       #     plt.close()
+        #print(projections)
+        projectionsXY.transpose()[1] = projections
+        #print(f"projectionsXY.shape: {projectionsXY.shape}")
         e = p.entropy(projections)
         entropies.append([theta,e])
+        projectionsByAngle.append([theta, projectionsXY])
 
-    entropy = np.array(entropies)
-    minEntropyIdx = np.argmin(entropy[:, 1])
-    minEntropyTheta = entropy[minEntropyIdx][0]
-    minEntropy = entropy[minEntropyIdx][1]
+    entropiesNp = np.array(entropies)
+    minEntropyIdx = np.argmin(entropiesNp[:, 1])
+    minEntropyTheta = entropiesNp[minEntropyIdx][0]
+    minEntropy = entropiesNp[minEntropyIdx][1]
+    minEntProjections = projectionsByAngle[minEntropyIdx][1]
+
+    rotated = p.rotate(-minEntropyTheta, minEntProjections)
+    minEntProjectionsXY = rotated.transpose()
+
+    c.chartOrigAndProjChromas(unique_chromas["./imgs/shady_person"], minEntProjectionsXY)
     
     print(f"Min Entropy: {minEntropy}\nMin Entropy Theta: {minEntropyTheta}")
-    c.chartEntropy(entropy, save=True)
-
-
+    c.chartEntropy(entropiesNp, save=True)
 
 if __name__ == '__main__':
     main()

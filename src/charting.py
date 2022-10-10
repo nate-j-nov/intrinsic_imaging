@@ -41,8 +41,6 @@ def chartOrigAndProjChromas(orig, projected, show = True, save = False, savefn =
     @param save: bool to indicate to save the plot
     @param savefn: file name to save the image
     '''
-    print(orig[:, 0])
-    print(orig[:, 1])
     xvals = orig[:, 0]
     yvals = orig[:, 1]
 
@@ -53,11 +51,17 @@ def chartOrigAndProjChromas(orig, projected, show = True, save = False, savefn =
 
     plt.scatter(x = xvals, y = yvals, s = 10, facecolors = "none", edgecolors = "lightblue")
 
+    z = np.polyfit(xvals, yvals, 1)
+    p = np.poly1d(z)
+    plt.plot(xvals, p(xvals))
+
     if(show): 
         plt.show()
     
     if(save): 
         plt.safefig(savefn)
+    
+    plt.close()
 
 def chartEntropy(entropyData, show = True, save = False, savefn = "./out/entropyplt.png"): 
     '''
