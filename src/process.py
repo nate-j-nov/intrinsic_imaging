@@ -128,33 +128,30 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
     cosa = math.cos(theta_r)
     sina = math.sin(theta_r)
     rotation = np.array([[cosa, -sina], [sina, cosa]])
-    print(rotation) # print rotation matrix
+    #print(rotation) # print rotation matrix
 
     # matrix multiply rotation by chromas 
     rotated = np.matmul(rotation, chromas)
-    print(rotated)
+    #print(rotated)
 
     projected = rotated[0]
-    print(f"projected = {projected}")
+    #print(f"projected = {projected}")
     return projected
 
 def entropy(chromas: np.ndarray) -> float:
     hist = np.histogram(chromas, bins=64)[0]
-    print(f"Histogram: {hist}")
+    #print(f"Histogram: {hist}")
     sum_bins = hist.sum()
-    print(f"Histogram sum: {sum_bins}")
+    #print(f"Histogram sum: {sum_bins}")
     px = hist/sum_bins
     px = np.sort(px)
     px = np.trim_zeros(px)
-    print(f"Probability hist: {px}")
+    #print(f"Probability hist: {px}")
     px = -px*np.log2(px)
-    print(f"Probability hist: {px}")
+    #print(f"Probability hist: {px}")
     entropy = px.sum()
-    print(f"Entropy = {entropy}")
+    #print(f"Entropy = {entropy}")
     return entropy
-
-
-    
 
 
 def main(): 

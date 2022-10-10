@@ -32,7 +32,7 @@ def chartChromaticity(chroma, show = True, save = False, savefn = "./out/chromap
 
     plt.close()
 
-def originalChromasAndProjectedChromas(orig, projected, show = True, save = False, savefn = "./out/origAndProjectedChromas.png"): 
+def chartOrigAndProjChromas(orig, projected, show = True, save = False, savefn = "./out/origAndProjectedChromas.png"): 
     '''
     Function to plot the original and projected chromaticities
     @param orig: np array of (G/R, B/R) chromaticity before projection
@@ -41,6 +41,8 @@ def originalChromasAndProjectedChromas(orig, projected, show = True, save = Fals
     @param save: bool to indicate to save the plot
     @param savefn: file name to save the image
     '''
+    print(orig[:, 0])
+    print(orig[:, 1])
     xvals = orig[:, 0]
     yvals = orig[:, 1]
 
