@@ -151,6 +151,7 @@ def entropy(chromas: np.ndarray) -> float:
     print(f"Probability hist: {px}")
     entropy = px.sum()
     print(f"Entropy = {entropy}")
+    return entropy
 
 
     
