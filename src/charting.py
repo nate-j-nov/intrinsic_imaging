@@ -24,15 +24,16 @@ def chartChromaticity(chroma, show = True, save = False, savefn = "./out/chromap
     plt.xlabel("log(G/R)")
     plt.ylabel("log(B/R)")
 
-    if(show):
-        plt.show() 
-    
     if(save): 
         plt.savefig(savefn)
 
+    if(show):
+        plt.show() 
+    
+
     plt.close()
 
-def originalChromasAndProjectedChromas(orig, projected, show = True, save = False, savefn = "./out/origAndProjectedChromas.png"): 
+def chartOrigAndProjChromas(orig, projected, show = True, save = False, savefn = "./out/origAndProjectedChromas.png"): 
     '''
     Function to plot the original and projected chromaticities
     @param orig: np array of (G/R, B/R) chromaticity before projection
@@ -51,11 +52,18 @@ def originalChromasAndProjectedChromas(orig, projected, show = True, save = Fals
 
     plt.scatter(x = xvals, y = yvals, s = 10, facecolors = "none", edgecolors = "lightblue")
 
+    z = np.polyfit(xvals, yvals, 1)
+    p = np.poly1d(z)
+    plt.plot(xvals, p(xvals))
+
+    if(save): 
+        plt.savefig(savefn)
+
     if(show): 
         plt.show()
     
-    if(save): 
-        plt.safefig(savefn)
+    
+    plt.close()
 
 def chartEntropy(entropyData, show = True, save = False, savefn = "./out/entropyplt.png"): 
     '''
@@ -72,11 +80,11 @@ def chartEntropy(entropyData, show = True, save = False, savefn = "./out/entropy
     plt.xlabel("Angle (Degrees)")
     plt.ylabel("Entropy")
 
-    if(show): 
-        plt.show()
-    
     if(save): 
         plt.savefig(savefn)
+
+    if(show): 
+        plt.show()
     
     plt.close()
 

@@ -31,15 +31,14 @@ def readimgs(dir):
         name = os.path.join(dir, file)
         if os.path.isfile(name): 
             split = os.path.splitext(name)
-            imgName = split[0]
-            ext = split[1]
+            imgName, ext = split[0], split[1]
             if ext == ".jpg" or ext == ".png": 
                 # if we get here, this is 1.) a file, and 2.) the file is an image
+                fn = os.path.splitext(file)[0]
                 img = cv2.imread(name, 1)
-                images[imgName] = img
+                images[fn] = img
     
     return images
-
 
 def calcImgChromaticity(imagesDict):
     '''
@@ -87,7 +86,6 @@ def removeDuplicateChromaticities(chromaDict):
                 br = pixelchr[1]
                 uniqueChromas.add(tuple([gr, br]))
         
-        print(f"chroma len: {chroma.shape}\nuniquechromas len: {len(uniqueChromas)}")
         chromalist = []
 
         for item in uniqueChromas: 
@@ -97,20 +95,28 @@ def removeDuplicateChromaticities(chromaDict):
 
     return uniqueChromasDict
 
-#def contains(collection, comparer):
-#    '''
-#    Function to determine if a collection contains a certain item 
-#    @param collection: nparray to determine to check if an item is contained within it
-#    @param comparer: item to dtermine if it exists in it
-#    @return: boolean indicating if comparer is in the collection
-#    ''' 
-#    for item in collection: 
-#        if math.isclose(item[0], comparer[0]) and math.isclose(item[1], comparer[1]): 
-#            return True
-#    
-#    return False;
-#
-#    pass
+def rotate(theta: int, chromas: np.ndarray) -> np.ndarray: 
+    '''
+    Function to rotate an nd array by angle theta
+    @param theta: integer representing the angle of rotation in degrees
+    @param chromas: Nx2 ndarray of chromaticity values
+    @param chromas: Nx2 ndarray of chromaticity values
+    @return: Nx2 ndarray of rotate chromaticit points
+    '''
+    if chromas.shape[1] == 2:
+        chromas = chromas.transpose()
+
+    # create rotation matrix
+    theta_r = math.radians(theta)
+    cosa = math.cos(theta_r)
+    sina = math.sin(theta_r)
+    rotation = np.array([[cosa, -sina], [sina, cosa]])
+    #print(rotation) # print rotation matrix
+
+    # matrix multiply rotation by chromas 
+    rotated = np.matmul(rotation, chromas)
+
+    return rotated
 
 def project(theta: int, chromas: np.ndarray) -> np.ndarray:
     ''' Function to project 2d points according to angle theta
@@ -123,38 +129,28 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
     if chromas.shape[1] == 2:
         chromas = chromas.transpose()
 
-    # create rotation matrix
-    theta_r = math.radians(theta)
-    cosa = math.cos(theta_r)
-    sina = math.sin(theta_r)
-    rotation = np.array([[cosa, -sina], [sina, cosa]])
-    print(rotation) # print rotation matrix
-
     # matrix multiply rotation by chromas 
-    rotated = np.matmul(rotation, chromas)
-    print(rotated)
+    rotated = rotate(theta, chromas)
+    #print(rotated)
 
     projected = rotated[0]
-    print(f"projected = {projected}")
+    #print(f"projected = {projected}")
     return projected
 
 def entropy(chromas: np.ndarray) -> float:
     hist = np.histogram(chromas, bins=64)[0]
-    print(f"Histogram: {hist}")
+    #print(f"Histogram: {hist}")
     sum_bins = hist.sum()
-    print(f"Histogram sum: {sum_bins}")
+    #print(f"Histogram sum: {sum_bins}")
     px = hist/sum_bins
     px = np.sort(px)
     px = np.trim_zeros(px)
-    print(f"Probability hist: {px}")
+    #print(f"Probability hist: {px}")
     px = -px*np.log2(px)
-    print(f"Probability hist: {px}")
+    #print(f"Probability hist: {px}")
     entropy = px.sum()
-    print(f"Entropy = {entropy}")
+    #print(f"Entropy = {entropy}")
     return entropy
-
-
-    
 
 
 def main(): 
