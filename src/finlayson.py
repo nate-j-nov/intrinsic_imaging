@@ -12,7 +12,7 @@ import math
 
 def main(): 
     print(f"Reading images...")
-    images = p.readimgs("./imgs/")
+    images = p.readimgs("./imgs/brendenCampus")
 
     for key in images: 
         image = images[key]
