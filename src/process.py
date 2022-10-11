@@ -31,15 +31,14 @@ def readimgs(dir):
         name = os.path.join(dir, file)
         if os.path.isfile(name): 
             split = os.path.splitext(name)
-            imgName = split[0]
-            ext = split[1]
+            imgName, ext = split[0], split[1]
             if ext == ".jpg" or ext == ".png": 
                 # if we get here, this is 1.) a file, and 2.) the file is an image
+                fn = os.path.splitext(file)[0]
                 img = cv2.imread(name, 1)
-                images[imgName] = img
+                images[fn] = img
     
     return images
-
 
 def calcImgChromaticity(imagesDict):
     '''

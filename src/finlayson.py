@@ -20,39 +20,37 @@ def main():
         image = cv2.resize(image, dsize = (height, width))
         images[key] = image
 
-    print(f"Calculating chromas...")
-    chromas = p.calcImgChromaticity(images)
-    print(f"Removing duplicate chromas...")
-    unique_chromas = p.removeDuplicateChromaticities(chromas)
-    for key in unique_chromas.keys():
-        print(f"unique_chromas key = {key}")
-    pic1 = unique_chromas['./imgs/shady_person']
-    entropies = []
-    projectionsXY = np.zeros(pic1.shape)
-    projectionsByAngle = []
-    print(f"Computing entropies...")
-    for theta in range(180):
-        projections = p.project(theta, pic1)
-        #print(projections)
-        projectionsXY.transpose()[1] = projections
-        #print(f"projectionsXY.shape: {projectionsXY.shape}")
-        e = p.entropy(projections)
-        entropies.append([theta,e])
-        projectionsByAngle.append([theta, projectionsXY])
+        print(f"Calculating chromas for {key}...")
+        chromas = p.calcImgChromaticity(images)
+        print(f"Removing duplicate chromas for {key}...")
 
-    entropiesNp = np.array(entropies)
-    minEntropyIdx = np.argmin(entropiesNp[:, 1])
-    minEntropyTheta = entropiesNp[minEntropyIdx][0]
-    minEntropy = entropiesNp[minEntropyIdx][1]
-    minEntProjections = projectionsByAngle[minEntropyIdx][1]
+        unique_chromas = p.removeDuplicateChromaticities(chromas)
+        uniqChromas = unique_chromas[key]
+        c.chartChromaticity(uniqChromas, False, True, f"./out/{key}_chromas.png")
+        entropies = []
+        projectionsXY = np.zeros(uniqChromas.shape)
+        projectionsByAngle = []
+        print(f"Computing entropies for {key}...")
+        for theta in range(180):
+            projections = p.project(theta, uniqChromas)
+            projectionsXY.transpose()[1] = projections
+            e = p.entropy(projections)
+            entropies.append([theta,e])
+            projectionsByAngle.append([theta, projectionsXY])
 
-    rotated = p.rotate(-minEntropyTheta, minEntProjections)
-    minEntProjectionsXY = rotated.transpose()
+        entropiesNp = np.array(entropies)
+        minEntropyIdx = np.argmin(entropiesNp[:, 1])
+        minEntropyTheta = entropiesNp[minEntropyIdx][0]
+        minEntropy = entropiesNp[minEntropyIdx][1]
+        minEntProjections = projectionsByAngle[minEntropyIdx][1]
 
-    c.chartOrigAndProjChromas(unique_chromas["./imgs/shady_person"], minEntProjectionsXY)
-    
-    print(f"Min Entropy: {minEntropy}\nMin Entropy Theta: {minEntropyTheta}")
-    c.chartEntropy(entropiesNp, save=True)
+        rotated = p.rotate(-minEntropyTheta, minEntProjections)
+        minEntProjectionsXY = rotated.transpose()
+
+        c.chartOrigAndProjChromas(unique_chromas[key], minEntProjectionsXY, show = False, save=True, savefn=f"./out/{key}_origAndProjChromas.png")
+        
+        print(f"{key}: Min Entropy: {minEntropy} Min Entropy Theta: {minEntropyTheta}\n\n")
+        c.chartEntropy(entropiesNp, show=False, save=True, savefn=f"./out/{key}_entropy.png")
 
 if __name__ == '__main__':
     main()
