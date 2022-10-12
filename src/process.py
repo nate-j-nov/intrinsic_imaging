@@ -65,6 +65,43 @@ def calcImgChromaticity(imagesDict):
 
     return chromaDict
 
+    
+def calcImgGeoMeanChroma(imagesDict):
+    '''
+    Function to calculate the geometric mean chromaticity of each pixel in the image
+    @param imagesDict: dictionary of images {image name : np array}
+    @return: dictionary of image names and their 3D geometric mean chromaticity 
+        {image name : np array of (log(R/(R*G*B)), log(G/(R*G*B)), log(B/(R*G*B))) chromaticity }
+    '''
+    chromaDict = {}
+    # chi1 and chi2 are an orthonormal basis for the 2d plane
+    #   normal to the vector u = (1/srt(3))(1,1,1) - calculated by hand
+    chi1 = np.array((1.0/math.sqrt(2), -1.0/math.sqrt(2), 0))
+    chi2 = np.array((1.0/math.sqrt(6), 1.0/math.sqrt(6), -math.sqrt(2)/math.sqrt(3)))
+    for key in imagesDict: 
+        bgrImage = imagesDict[key]
+        height, width, depth = bgrImage.shape
+        chroma = np.zeros((height, width, 2), dtype=float)
+        for row in range(height): 
+            for col in range(width): 
+                pixel = bgrImage[row, col]
+                # add 1 to avoid divide by zero and log(0) errors
+                b, g, r = pixel[0]+1, pixel[1]+1, pixel[2]+1 
+                M = math.pow(b*g*r*1.0, 1/3) # geometric mean divisor
+
+                # compute rho values with geometric mean divisor 
+                rb = math.log(b*1.0 / M)
+                rg = math.log(g*1.0 / M)
+                rr = math.log(r*1.0 / M)
+
+                # compute 2d chroma space by projecting onto chi1 and chi2
+                chroma[row, col, 0] = rb*chi1[0] + rg*chi1[1] + rr*chi1[2]                
+                chroma[row, col, 1] = rb*chi2[0] + rg*chi2[1] + rr*chi2[2]                
+        
+        chromaDict[key] = chroma
+
+    return chromaDict
+
 
 def removeDuplicateChromaticities(chromaDict): 
     '''
@@ -138,18 +175,19 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
     return projected
 
 def entropy(chromas: np.ndarray) -> float:
+    ''' Computes entropy of an ndarray as specified in Finlayson.
+        Unlike in Finlayson, we do not excise data below the 5th
+        above the 95th percentile, but rather keep the whole array.
+        @param chromas: ndarray of 1d chromaticies (after projection)
+        @return: entropy as a float
+    '''
     hist = np.histogram(chromas, bins=64)[0]
-    #print(f"Histogram: {hist}")
     sum_bins = hist.sum()
-    #print(f"Histogram sum: {sum_bins}")
     px = hist/sum_bins
     px = np.sort(px)
     px = np.trim_zeros(px)
-    #print(f"Probability hist: {px}")
     px = -px*np.log2(px)
-    #print(f"Probability hist: {px}")
     entropy = px.sum()
-    #print(f"Entropy = {entropy}")
     return entropy
 
 

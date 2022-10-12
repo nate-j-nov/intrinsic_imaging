@@ -10,9 +10,12 @@ from decimal import Decimal
 import cv2
 import math 
 
+#OFFSET = 0.20
+OFFSET = 0.0
+
 def main(): 
     print(f"Reading images...")
-    images = p.readimgs("./imgs/natephonePen")
+    images = p.readimgs("./imgs")
 
 #    for key in images: 
 #        image = images[key]
@@ -21,9 +24,10 @@ def main():
 #        images[key] = image
 #        print(f"Image shape: {image.shape}")
 
-#    print(f"Calculating chromas for {key}...")
-    chromas = p.calcImgChromaticity(images)
-#    print(f"Removing duplicate chromas for {key}...")
+    print(f"Calculating chromas...")
+#    chromas = p.calcImgChromaticity(images)
+    chromas = p.calcImgGeoMeanChroma(images)
+    print(f"Removing duplicate chromas...")
 
     unique_chromas = {}
     for key in chromas:
@@ -65,13 +69,16 @@ def main():
         print(f"max = {fg_max}, min = {fg_min}")
         diff = abs(fg_max - fg_min)
         flat_gray = flat_gray - fg_min
-        flat_gray = flat_gray * (1.0 / diff)
+        flat_gray = flat_gray * ((1.0) / diff)
         fg_min = flat_gray.min()
         fg_max = flat_gray.max()
-        print(f"max = {fg_max}, min = {fg_min}")
-        fg_int = flat_gray.astype(int)
-        un, cts = np.unique(fg_int, return_counts=True)
-        print(np.asarray((un,cts)).T)
+        print(f"1st adjustment max = {fg_max}, min = {fg_min}")
+        flat_gray = flat_gray * (1.0 - OFFSET)
+        flat_gray = flat_gray + OFFSET 
+        fg_min = flat_gray.min()
+        fg_max = flat_gray.max()
+        print(f"2nd adjustment max = {fg_max}, min = {fg_min}")
+
         gray_chromas[key] = np.reshape(flat_gray,(rows, cols))
 #gray_chromas[key] = np.reshape(fg_int,(rows, cols))
         print(f"Grayscale Shape: {gray_chromas[key].shape}")
@@ -81,9 +88,12 @@ def main():
 
         minEntropy = entropiesNp[minEntropyIdx][1]
         minEntProjections = projectionsByAngle[minEntropyIdx][1]
+        print(f"minEntProjections shape = {minEntProjections.shape}")
 
         rotated = p.rotate(-minEntropyTheta, minEntProjections)
         minEntProjectionsXY = rotated.transpose()
+
+        print(f"chroma shape: {unique_chromas[key].shape}, proj shape: {minEntProjectionsXY.shape}")
 
         c.chartOrigAndProjChromas(unique_chromas[key], minEntProjectionsXY, show = False, save=True, savefn=f"./out/{key}_origAndProjChromas.png")
         
@@ -92,3 +102,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+#   fg_int = flat_gray.astype(int)
+#   un, cts = np.unique(fg_int, return_counts=True)
+#   print(np.asarray((un,cts)).T)
