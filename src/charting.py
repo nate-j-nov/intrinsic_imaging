@@ -51,6 +51,8 @@ def chartOrigAndProjChromas(orig, projected, show = True, save = False, savefn =
     yvals = projected[:, 1]
 
     plt.scatter(x = xvals, y = yvals, s = 10, facecolors = "none", edgecolors = "lightblue")
+    plt.xlabel("log(G/R)")
+    plt.ylabel("log(B/R)")
 
     z = np.polyfit(xvals, yvals, 1)
     p = np.poly1d(z)
