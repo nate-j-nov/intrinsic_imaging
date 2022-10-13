@@ -71,8 +71,7 @@ def main():
         print(f"2nd adjustment max = {fg_max}, min = {fg_min}")
 
         gray_chromas[key] = np.reshape(flat_gray,(rows, cols))
-        #TODO: UNCOMMENT
-       # cv2.imshow("grayscale",gray_chromas[key])
+        cv2.imshow("grayscale",gray_chromas[key])
         cv2.imwrite(f"./out/{key}_grayscale.png", gray_chromas[key]*255)
         cv2.waitKey(0)
 
