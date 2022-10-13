@@ -1,42 +1,29 @@
 # Brenden Collins // Nate Novak
 # CS 7180: Advanced perception 
+# Fall 2022
 # Program to conduct Finlayson Intrinisic imaging algorithm
 
 import numpy as np
 import matplotlib.pyplot as plt
 import process as p
 import charting as c
-from decimal import Decimal
 import cv2
 import math 
 
-#OFFSET = 0.20
-OFFSET = 0.0
+OFFSET = 0.15
 
 def main(): 
     print(f"Reading images...")
     images = p.readimgs("./imgs")
 
-#    for key in images: 
-#        image = images[key]
-#        height, width = int(image.shape[0] / 2), int(image.shape[1] / 2)
-#        image = cv2.resize(image, dsize = (height, width))
-#        images[key] = image
-#        print(f"Image shape: {image.shape}")
-
     print(f"Calculating chromas...")
-#    chromas = p.calcImgChromaticity(images)
     chromas = p.calcImgGeoMeanChroma(images)
-    print(f"Removing duplicate chromas...")
 
     unique_chromas = {}
     for key in chromas:
         rows = chromas[key].shape[0]
         cols = chromas[key].shape[1]
-        print(f"Chromas {key} shape: {chromas[key].shape}")
         unique_chromas[key] = chromas[key].reshape((rows*cols,2))
-
-#    unique_chromas = p.removeDuplicateChromaticities(chromas)
 
     gray_chromas = {}
     for key in unique_chromas:
@@ -46,6 +33,7 @@ def main():
         projectionsXY = np.zeros(uniqChromas.shape)
         projectionsByAngle = []
         print(f"Computing entropies for {key}...")
+        # Project chromaticities according to each angle theta
         for theta in range(180):
             projections = p.project(theta, uniqChromas)
             projectionsXY.transpose()[0] = projections
@@ -56,11 +44,15 @@ def main():
         entropiesNp = np.array(entropies)
         minEntropyIdx = np.argmin(entropiesNp[:, 1])
         minEntropyTheta = entropiesNp[minEntropyIdx,0]
+        minEntropy = entropiesNp[minEntropyIdx][1]
+        minEntProjections = projectionsByAngle[minEntropyIdx][1]
+
+        print(f"{key}: Min Entropy: {minEntropy} Min Entropy Theta: {minEntropyTheta}")
 
         # compute projected value for every pixel in chroma image
+        print(f"Generating grayscale image for {key}...")
         rows = chromas[key].shape[0]
         cols = chromas[key].shape[1]
-        print(f"Chroma Shape: {chromas[key].shape}, Rows: {rows}, Cols: {cols}")
         flattened = np.reshape(chromas[key], (rows*cols, 2)) 
         flat_gray = p.project(minEntropyTheta,flattened)
         flat_gray = np.exp(flat_gray)
@@ -80,28 +72,17 @@ def main():
         print(f"2nd adjustment max = {fg_max}, min = {fg_min}")
 
         gray_chromas[key] = np.reshape(flat_gray,(rows, cols))
-#gray_chromas[key] = np.reshape(fg_int,(rows, cols))
-        print(f"Grayscale Shape: {gray_chromas[key].shape}")
-        print(f"gray values: {gray_chromas[key]}")
         cv2.imshow("grayscale",gray_chromas[key])
+        cv2.imwrite(f"./out/{key}_grayscale.png", gray_chromas[key]*255)
         cv2.waitKey(0)
-
-        minEntropy = entropiesNp[minEntropyIdx][1]
-        minEntProjections = projectionsByAngle[minEntropyIdx][1]
-        print(f"minEntProjections shape = {minEntProjections.shape}")
 
         rotated = p.rotate(-minEntropyTheta, minEntProjections)
         minEntProjectionsXY = rotated.transpose()
 
-        print(f"chroma shape: {unique_chromas[key].shape}, proj shape: {minEntProjectionsXY.shape}")
-
         c.chartOrigAndProjChromas(unique_chromas[key], minEntProjectionsXY, show = False, save=True, savefn=f"./out/{key}_origAndProjChromas.png")
         
-        print(f"{key}: Min Entropy: {minEntropy} Min Entropy Theta: {minEntropyTheta}\n\n")
         c.chartEntropy(entropiesNp, show=False, save=True, savefn=f"./out/{key}_entropy.png")
+        print("\n")
 
 if __name__ == '__main__':
     main()
-#   fg_int = flat_gray.astype(int)
-#   un, cts = np.unique(fg_int, return_counts=True)
-#   print(np.asarray((un,cts)).T)
