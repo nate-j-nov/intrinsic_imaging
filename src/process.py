@@ -2,12 +2,9 @@
 # CS 7180: Advanced perception 
 # Module to hold all of the steps of the algorithm
 
-from gc import collect
-from genericpath import isfile
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.markers import MarkerStyle
 import os
 import math
 
@@ -148,7 +145,6 @@ def rotate(theta: int, chromas: np.ndarray) -> np.ndarray:
     cosa = math.cos(theta_r)
     sina = math.sin(theta_r)
     rotation = np.array([[cosa, -sina], [sina, cosa]])
-    #print(rotation) # print rotation matrix
 
     # matrix multiply rotation by chromas 
     rotated = np.matmul(rotation, chromas)
@@ -168,10 +164,8 @@ def project(theta: int, chromas: np.ndarray) -> np.ndarray:
 
     # matrix multiply rotation by chromas 
     rotated = rotate(theta, chromas)
-    #print(rotated)
 
     projected = rotated[0]
-    #print(f"projected = {projected}")
     return projected
 
 def entropy(chromas: np.ndarray) -> float:
@@ -191,7 +185,10 @@ def entropy(chromas: np.ndarray) -> float:
     return entropy
 
 
-def main(): 
+def test(): 
+    ''' 
+    Function to test this library
+    '''
     images = readimgs("./imgs/")
     chromas = calcImgChromaticity(images)
     unique_chromas = removeDuplicateChromaticities(chromas)
@@ -208,8 +205,9 @@ def main():
         print(f"zero_proj = {zeros}")
         plt.scatter(zeros[:,0], zeros[:,1], 1)
         plt.show()
+
+def main(): 
+    test()
         
-
-
 if __name__ == "__main__":
     main()

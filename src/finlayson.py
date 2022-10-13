@@ -9,7 +9,7 @@ import charting as c
 import cv2
 import math 
 
-OFFSET = 0.0
+OFFSET = 0.15
 
 def main(): 
     print(f"Reading images...")
@@ -17,7 +17,6 @@ def main():
 
     print(f"Calculating chromas...")
     chromas = p.calcImgGeoMeanChroma(images)
-    print(f"Removing duplicate chromas...")
 
     unique_chromas = {}
     for key in chromas:
@@ -76,7 +75,6 @@ def main():
        # cv2.imshow("grayscale",gray_chromas[key])
         cv2.imwrite(f"./out/{key}_grayscale.png", gray_chromas[key]*255)
         cv2.waitKey(0)
-
 
         rotated = p.rotate(-minEntropyTheta, minEntProjections)
         minEntProjectionsXY = rotated.transpose()
