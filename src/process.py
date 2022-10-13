@@ -1,5 +1,6 @@
 # Brenden Collins // Nate Novak
 # CS 7180: Advanced perception 
+# Fall 2022
 # Module to hold all of the steps of the algorithm
 
 import cv2

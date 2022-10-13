@@ -1,5 +1,6 @@
 # Brenden Collins // Nate Novak
 # CS 7180: Advanced perception 
+# Fall 2022
 # Program to conduct Finlayson Intrinisic imaging algorithm
 
 import numpy as np
